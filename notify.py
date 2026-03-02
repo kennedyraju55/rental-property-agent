@@ -11,7 +11,7 @@ req = urllib.request.Request(
     url,
     data=f"Rent of ${RENT_AMOUNT:,} is due today! Please collect from your tenant.".encode(),
     headers={
-        "Title": "🏠 Rent Due Reminder",
+        "Title": "Rent Due Reminder",
         "Priority": "high",
         "Tags": "house,moneybag",
     },
