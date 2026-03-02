@@ -7,6 +7,7 @@ from hoa_check import get_hoa_dues
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 NOTIFY_EMAIL = os.environ["NOTIFY_EMAIL"]
 GMAIL_FROM = "rajug058@gmail.com"
+PROPERTY_ADDRESS = "121 Groveland Dr, Liberty Hill, TX 78642"
 RENT_AMOUNT = 2150
 
 # Build message
@@ -29,7 +30,7 @@ message = "\n".join(lines)
 msg = MIMEMultipart()
 msg["From"] = GMAIL_FROM
 msg["To"] = NOTIFY_EMAIL
-msg["Subject"] = "🏠 Rent & HOA Due Reminder"
+msg["Subject"] = f"🏠 Rent & HOA Due — {PROPERTY_ADDRESS}"
 msg.attach(MIMEText(message, "plain"))
 
 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
