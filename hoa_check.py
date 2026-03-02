@@ -42,17 +42,7 @@ def get_hoa_dues() -> dict:
             # Save screenshot of dashboard for debugging
             page.screenshot(path="townsq-debug.png")
 
-            # Navigate to payments section
-            try:
-                page.click('a:has-text("Payments"), a:has-text("Account"), nav >> text=Pay', timeout=5000)
-                page.wait_for_load_state("networkidle", timeout=10000)
-            except PlaywrightTimeout:
-                # Try direct URL if nav link not found
-                page.goto(HOA_URL.replace("homepage", "payments"), timeout=15000)
-
-            # Extract balance due and due date
-            content = page.content()
-
+            # Data is on the homepage — extract directly
             balance = _extract_balance(page)
             due_date = _extract_due_date(page)
 
@@ -80,26 +70,17 @@ def get_hoa_dues() -> dict:
 
 
 def _extract_balance(page) -> str | None:
-    """Try multiple selectors to find the balance amount."""
-    selectors = [
-        '[class*="balance"]',
-        '[class*="amount-due"]',
-        '[class*="total-due"]',
-        'text=/\\$[\\d,]+\\.\\d{2}/',
-    ]
-    for selector in selectors:
-        try:
-            el = page.locator(selector).first
-            if el.is_visible(timeout=2000):
-                text = el.inner_text().strip()
-                if "$" in text:
-                    return text
-        except Exception:
-            continue
-    # Fallback: scan all text for dollar amounts near "due" or "balance"
+    """Extract Current Balance from the Account Information section."""
+    import re
     try:
+        # Wait for the account info widget to load
+        page.wait_for_selector('text=Current Balance', timeout=10000)
         text = page.inner_text("body")
-        import re
+        # "Current Balance:\n$0.00" or "Current Balance: $0.00"
+        m = re.search(r'Current Balance[:\s]*\n?\s*(\$[\d,]+\.\d{2})', text)
+        if m:
+            return m.group(1).strip()
+        # Fallback: any dollar amount on page
         matches = re.findall(r'\$[\d,]+\.\d{2}', text)
         if matches:
             return matches[0]
@@ -109,15 +90,18 @@ def _extract_balance(page) -> str | None:
 
 
 def _extract_due_date(page) -> str | None:
-    """Try to extract the due date from the page."""
+    """Extract Last Payment date from the Account Information section."""
     import re
     try:
         text = page.inner_text("body")
-        # Look for patterns like "Due: January 1" or "due by 01/01/2026"
+        # "Last payment:\n03/02/2026" or similar
+        m = re.search(r'Last payment[:\s]*\n?\s*(\d{2}/\d{2}/\d{4})', text)
+        if m:
+            return m.group(1).strip()
+        # Try other date patterns near "due"
         patterns = [
             r'[Dd]ue\s+[Bb]y\s+([\w\s,]+?\d{4})',
             r'[Dd]ue\s+[Dd]ate[:\s]+([\w\s,/]+)',
-            r'[Dd]ue\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2}',
             r'\b(\d{1,2}/\d{1,2}/\d{4})\b',
         ]
         for pattern in patterns:

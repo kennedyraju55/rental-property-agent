@@ -14,9 +14,9 @@ hoa = get_hoa_dues()
 if hoa["success"] and (hoa["balance"] or hoa["due_date"]):
     hoa_parts = []
     if hoa["balance"]:
-        hoa_parts.append(f"Balance: {hoa['balance']}")
+        hoa_parts.append(f"Current Balance: {hoa['balance']}")
     if hoa["due_date"]:
-        hoa_parts.append(f"Due by: {hoa['due_date']}")
+        hoa_parts.append(f"Last Payment: {hoa['due_date']}")
     lines.append(f"HOA Dues — {' | '.join(hoa_parts)}")
 else:
     lines.append("HOA Dues — could not retrieve (check TownSq manually)")
