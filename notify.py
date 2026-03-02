@@ -1,15 +1,20 @@
 import os
 import urllib.request
 import urllib.error
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from hoa_check import get_hoa_dues
 
 NTFY_TOPIC = os.environ["NTFY_TOPIC"]
+GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
+NOTIFY_EMAIL = os.environ["NOTIFY_EMAIL"]
+GMAIL_FROM = "rajug058@gmail.com"
 RENT_AMOUNT = 2150
 
-# Build rent message
+# Build message
 lines = [f"Rent of ${RENT_AMOUNT:,} is due today! Please collect from your tenant."]
 
-# Append HOA dues info
 hoa = get_hoa_dues()
 if hoa["success"] and (hoa["balance"] or hoa["due_date"]):
     hoa_parts = []
@@ -23,8 +28,21 @@ else:
 
 message = "\n".join(lines)
 
-url = f"https://ntfy.sh/{NTFY_TOPIC}"
+# Send Gmail
+msg = MIMEMultipart()
+msg["From"] = GMAIL_FROM
+msg["To"] = NOTIFY_EMAIL
+msg["Subject"] = "🏠 Rent & HOA Due Reminder"
+msg.attach(MIMEText(message, "plain"))
 
+with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+    server.login(GMAIL_FROM, GMAIL_APP_PASSWORD)
+    server.sendmail(GMAIL_FROM, NOTIFY_EMAIL, msg.as_string())
+    print(f"✅ Email sent to {NOTIFY_EMAIL}")
+    print(f"Message:\n{message}")
+
+# Also send ntfy push notification
+url = f"https://ntfy.sh/{NTFY_TOPIC}"
 req = urllib.request.Request(
     url,
     data=message.encode(),
@@ -35,7 +53,5 @@ req = urllib.request.Request(
     },
     method="POST"
 )
-
 with urllib.request.urlopen(req) as response:
-    print(f"✅ Notification sent! Status: {response.status}")
-    print(f"Message:\n{message}")
+    print(f"✅ Push notification sent! Status: {response.status}")
