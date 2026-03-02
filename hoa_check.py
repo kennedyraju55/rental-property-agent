@@ -19,15 +19,19 @@ def get_hoa_dues() -> dict:
             # Navigate to homepage — will redirect to login if not authenticated
             page.goto(HOA_URL, timeout=30000)
 
-            # Wait for Angular to render the login form
+            # Wait for Angular to render, then click "Log in" to reveal the form
+            page.wait_for_selector('button:has-text("Log in"), a:has-text("Log in")', timeout=30000)
+            page.click('button:has-text("Log in"), a:has-text("Log in")')
+
+            # Now wait for email/password fields to appear
             email_input = page.wait_for_selector(
-                'input[type="email"], input[name="email"], input[formcontrolname="email"], input[placeholder*="email" i], input[placeholder*="Email" i]',
-                timeout=30000
+                'input[type="email"], input[name="email"], input[formcontrolname="email"]',
+                timeout=15000
             )
             email_input.fill(email)
 
             page.fill('input[type="password"], input[name="password"], input[formcontrolname="password"]', password)
-            page.click('button[type="submit"], button:has-text("Sign In"), button:has-text("Log In"), button:has-text("Login")')
+            page.click('button[type="submit"], button:has-text("Sign in"), button:has-text("Log in"), button:has-text("Continue")')
 
             # Wait for redirect back to homepage after login
             page.wait_for_url("**/homepage**", timeout=20000)
