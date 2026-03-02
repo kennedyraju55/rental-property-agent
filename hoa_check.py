@@ -39,6 +39,9 @@ def get_hoa_dues() -> dict:
             # Wait for redirect back to homepage after login
             page.wait_for_url("**/homepage**", timeout=20000)
 
+            # Save screenshot of dashboard for debugging
+            page.screenshot(path="townsq-debug.png")
+
             # Navigate to payments section
             try:
                 page.click('a:has-text("Payments"), a:has-text("Account"), nav >> text=Pay', timeout=5000)
