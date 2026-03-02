@@ -1,12 +1,9 @@
 import os
-import urllib.request
-import urllib.error
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from hoa_check import get_hoa_dues
 
-NTFY_TOPIC = os.environ["NTFY_TOPIC"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 NOTIFY_EMAIL = os.environ["NOTIFY_EMAIL"]
 GMAIL_FROM = "rajug058@gmail.com"
@@ -40,18 +37,3 @@ with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
     server.sendmail(GMAIL_FROM, NOTIFY_EMAIL, msg.as_string())
     print(f"✅ Email sent to {NOTIFY_EMAIL}")
     print(f"Message:\n{message}")
-
-# Also send ntfy push notification
-url = f"https://ntfy.sh/{NTFY_TOPIC}"
-req = urllib.request.Request(
-    url,
-    data=message.encode(),
-    headers={
-        "Title": "Rent & HOA Due Reminder",
-        "Priority": "high",
-        "Tags": "house,moneybag",
-    },
-    method="POST"
-)
-with urllib.request.urlopen(req) as response:
-    print(f"✅ Push notification sent! Status: {response.status}")

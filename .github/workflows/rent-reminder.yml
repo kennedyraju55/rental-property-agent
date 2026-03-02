@@ -25,7 +25,6 @@ jobs:
 
       - name: Send Rent & HOA Reminder
         env:
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           TOWNSQ_EMAIL: ${{ secrets.TOWNSQ_EMAIL }}
           TOWNSQ_PASSWORD: ${{ secrets.TOWNSQ_PASSWORD }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
