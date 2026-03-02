@@ -18,7 +18,14 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Send Push Notification
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium --with-deps
+
+      - name: Send Rent & HOA Reminder
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TOWNSQ_EMAIL: ${{ secrets.TOWNSQ_EMAIL }}
+          TOWNSQ_PASSWORD: ${{ secrets.TOWNSQ_PASSWORD }}
         run: python notify.py
