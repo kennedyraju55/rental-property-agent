@@ -1,46 +1,46 @@
 # 🏠 Rental Property Agent
 
-A lightweight agent that sends a **WhatsApp notification on the 1st of every month** reminding you to collect rent.
+A lightweight agent that sends a **push notification on the 1st of every month** reminding you to collect rent.
 
 > **Rent Amount:** $2,150/month
 
 ---
 
+## How It Works
+
+- **GitHub Actions** runs a Python script automatically on the 1st of every month at 9:00 AM UTC
+- The script sends a push notification via **[ntfy.sh](https://ntfy.sh)** (free, no account needed)
+- You receive the notification on your phone via the **Ntfy app**
+
+---
+
 ## Setup
 
-### Step 1: Register with Callmebot (one-time)
+### Step 1: Install the Ntfy App on Your Phone
 
-1. Save **+34 644 77 68 09** as a contact in WhatsApp (name it "CallMeBot")
-2. Send this exact message to that number:
-   ```
-   I allow callmebot to send me messages
-   ```
-3. You'll receive a reply with your **API key** — save it!
+| Platform | Link |
+|---|---|
+| Android | [Google Play](https://play.google.com/store/apps/details?id=io.heckel.ntfy) |
+| iPhone | [App Store](https://apps.apple.com/app/ntfy/id1625396347) |
 
-### Step 2: Create GitHub Repository
+Open the app → tap **Subscribe to topic** → enter:
+```
+rental-reminder-rajug058
+```
 
-1. Create a new repo at [github.com/new](https://github.com/new) named `rental-property-agent`
-2. Push this code:
-   ```bash
-   git remote add origin https://github.com/YOUR_USERNAME/rental-property-agent.git
-   git branch -M main
-   git add .
-   git commit -m "Initial commit: monthly rent reminder"
-   git push -u origin main
-   ```
+### Step 2: GitHub Secret (already configured)
 
-### Step 3: Add GitHub Secrets
-
-Go to your repo → **Settings → Secrets and variables → Actions → New repository secret**
+The following secret is already set in this repository:
 
 | Secret Name | Value |
 |---|---|
-| `CALLMEBOT_PHONE` | Your WhatsApp number with country code (e.g. `+12025551234`) |
-| `CALLMEBOT_APIKEY` | The API key you received from Callmebot |
+| `NTFY_TOPIC` | `rental-reminder-rajug058` |
 
-### Step 4: Test It
+> If you fork this repo, go to **Settings → Secrets and variables → Actions** and add `NTFY_TOPIC` with your own unique topic name.
 
-Go to **Actions → Monthly Rent Reminder → Run workflow** to trigger it manually and verify you receive the WhatsApp message.
+### Step 3: Test It
+
+Go to **Actions → Monthly Rent Reminder → Run workflow** to trigger it manually and verify you receive the push notification.
 
 ---
 
