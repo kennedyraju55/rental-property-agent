@@ -30,6 +30,9 @@ def get_hoa_dues() -> dict:
             )
             email_input.fill(email)
 
+            # Two-step login: click Next to reveal password field
+            page.click('button:has-text("Next")')
+
             page.fill('input[type="password"], input[name="password"], input[formcontrolname="password"]', password)
             page.click('button[type="submit"], button:has-text("Sign in"), button:has-text("Log in"), button:has-text("Continue")')
 
