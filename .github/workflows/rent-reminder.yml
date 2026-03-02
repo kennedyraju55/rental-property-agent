@@ -1,0 +1,25 @@
+name: Monthly Rent Reminder
+
+on:
+  schedule:
+    # Runs at 9:00 AM UTC on the 1st of every month
+    - cron: '0 9 1 * *'
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  send-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Send WhatsApp Notification
+        env:
+          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+        run: python notify.py
