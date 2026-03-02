@@ -18,8 +18,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Send WhatsApp Notification
+      - name: Send Push Notification
         env:
-          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
-          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python notify.py
