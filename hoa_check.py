@@ -16,16 +16,21 @@ def get_hoa_dues() -> dict:
         page = context.new_page()
 
         try:
-            # Go to login page
-            page.goto(LOGIN_URL, wait_until="networkidle", timeout=30000)
+            # Navigate to homepage — will redirect to login if not authenticated
+            page.goto(HOA_URL, timeout=30000)
 
-            # Fill login form
-            page.fill('input[type="email"], input[name="email"], input[placeholder*="email" i]', email)
-            page.fill('input[type="password"], input[name="password"]', password)
-            page.click('button[type="submit"], button:has-text("Sign in"), button:has-text("Log in")')
+            # Wait for Angular to render the login form
+            email_input = page.wait_for_selector(
+                'input[type="email"], input[name="email"], input[formcontrolname="email"], input[placeholder*="email" i], input[placeholder*="Email" i]',
+                timeout=30000
+            )
+            email_input.fill(email)
 
-            # Wait for redirect after login
-            page.wait_for_url("**/homepage**", timeout=15000)
+            page.fill('input[type="password"], input[name="password"], input[formcontrolname="password"]', password)
+            page.click('button[type="submit"], button:has-text("Sign In"), button:has-text("Log In"), button:has-text("Login")')
+
+            # Wait for redirect back to homepage after login
+            page.wait_for_url("**/homepage**", timeout=20000)
 
             # Navigate to payments section
             try:
@@ -45,6 +50,11 @@ def get_hoa_dues() -> dict:
 
         except PlaywrightTimeout as e:
             print(f"⚠️ TownSq timeout: {e}")
+            try:
+                page.screenshot(path="townsq-debug.png")
+                print("📸 Screenshot saved: townsq-debug.png")
+            except Exception:
+                pass
             return {"balance": None, "due_date": None, "success": False, "error": str(e)}
         except Exception as e:
             print(f"⚠️ TownSq error: {e}")
